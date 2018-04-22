@@ -1,0 +1,42 @@
+version: '3'
+
+services:
+
+  app:
+    build:
+      context: ./
+      dockerfile: app.dockerfile
+    working_dir: /var/www/laravel
+    volumes:
+      - './laravel:/var/www/laravel'
+    environment:
+      - DB_HOST=mysqldb #same name as service below
+      - DB_PORT=3306
+
+  #web (nginx)
+  web:
+    build:
+      context: ./
+      dockerfile: web.dockerfile
+    working_dir: /var/www
+    volumes:
+      - app
+    ports: 
+      - "8080:80"
+
+  #MYSQL DB
+  mysqldb:
+    image: mysql:5.7
+    volumes:
+      - ladata:/var/lib/mysql
+    environment:
+      - "MYSQL_DATABASE=app" #named whatever the project is
+      - "MYSQL_USER=app"
+      - "MYSQL_PASSWORD=password"
+      - "MYSQL_ROOT_PASSWORD=rootpassword"
+    ports:
+      - "33061:3306"
+
+#select volumes to use
+volumes:
+  ladata:
